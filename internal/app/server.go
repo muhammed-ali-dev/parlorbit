@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"mime"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -29,24 +30,32 @@ type App struct {
 	hubs     *hubManager
 	mux      *http.ServeMux
 	commands sync.Mutex
+	battles  *battleManager
 }
 
 func New(cfg Config) (*App, error) {
+	if err := validateMediaConfig(cfg); err != nil {
+		return nil, err
+	}
+	if err := validateDemoConfig(cfg); err != nil {
+		return nil, err
+	}
 	store, err := OpenStore(cfg.DatabasePath)
 	if err != nil {
 		return nil, err
 	}
 	a := &App{cfg: cfg, store: store, hubs: newHubManager(store), mux: http.NewServeMux()}
+	a.battles = newBattleManager(store)
 	a.hubs.commands = &a.commands
 	a.hubs.revokeVoice = a.revokeVoice
 	a.routes()
 	return a, nil
 }
 
-func (a *App) Close() error { return a.store.Close() }
+func (a *App) Close() error { a.battles.close(); return a.store.Close() }
 
 func (a *App) Handler() http.Handler {
-	return a.securityHeaders(a.requestContext(a.mux))
+	return a.securityHeaders(a.requestContext(a.demoGate(a.mux)))
 }
 
 func (a *App) routes() {
@@ -77,6 +86,9 @@ func (a *App) routes() {
 	a.mux.HandleFunc("POST /api/v1/houses/{houseId}/rooms/{roomId}/voice-token", a.withSession(a.handleVoiceToken))
 	a.mux.HandleFunc("POST /api/v1/livekit/webhook", a.handleLiveKitWebhook)
 	a.mux.HandleFunc("GET /api/v1/realtime", a.withSession(a.handleRealtime))
+	a.mux.HandleFunc("POST /api/v1/battle/join", a.withSession(a.handleBattleJoin))
+	a.mux.HandleFunc("POST /api/v1/battle/{action}", a.withSession(a.handleBattleCommand))
+	a.mux.HandleFunc("GET /api/v1/battle/events", a.withSession(a.handleBattleEvents))
 	a.mux.HandleFunc("/", a.handleStatic)
 }
 
@@ -94,8 +106,16 @@ func (a *App) securityHeaders(next http.Handler) http.Handler {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Referrer-Policy", "same-origin")
-		w.Header().Set("Permissions-Policy", "camera=(), geolocation=(), microphone=(self)")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src https://codenames.game; connect-src 'self' ws: wss: https://*.livekit.cloud; media-src 'self' blob:")
+		w.Header().Set("Permissions-Policy", "camera=(self), geolocation=(), microphone=(self)")
+		connectSources := "'self' ws: wss: https://*.livekit.cloud"
+		if endpoint, err := url.Parse(a.cfg.LiveKitURL); err == nil && endpoint.Host != "" && endpoint.User == nil && (endpoint.Scheme == "ws" || endpoint.Scheme == "wss") {
+			scheme := "https"
+			if endpoint.Scheme == "ws" {
+				scheme = "http"
+			}
+			connectSources += " " + (&url.URL{Scheme: scheme, Host: endpoint.Host}).String()
+		}
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src https://codenames.game; connect-src "+connectSources+"; media-src 'self' blob:")
 		next.ServeHTTP(w, r)
 	})
 }
@@ -129,7 +149,7 @@ func (a *App) withSession(next func(http.ResponseWriter, *http.Request, session)
 			writeError(w, r, http.StatusUnauthorized, "session_expired", "This browser session has expired.", nil)
 			return
 		}
-		if r.URL.Path != "/api/v1/realtime" {
+		if r.URL.Path != "/api/v1/realtime" && r.URL.Path != "/api/v1/battle/events" {
 			a.commands.Lock()
 			defer a.commands.Unlock()
 		}
@@ -545,8 +565,8 @@ func (a *App) handleVoiceToken(w http.ResponseWriter, r *http.Request, ss sessio
 		return
 	}
 	canPublish, canSubscribe := true, true
-	grant := &auth.VideoGrant{RoomJoin: true, Room: "roomcade_" + roomID, CanPublish: &canPublish, CanSubscribe: &canSubscribe, CanPublishSources: []string{"microphone"}}
-	token, err := auth.NewAccessToken(a.cfg.LiveKitAPIKey, a.cfg.LiveKitSecret).SetIdentity(fmt.Sprintf("%s_%d", m.ID, m.MediaGeneration)).SetValidFor(2 * time.Minute).AddGrant(grant).ToJWT()
+	grant := &auth.VideoGrant{RoomJoin: true, Room: "roomcade_" + roomID, CanPublish: &canPublish, CanSubscribe: &canSubscribe, CanPublishSources: []string{"microphone", "camera"}}
+	token, err := auth.NewAccessToken(a.cfg.LiveKitAPIKey, a.cfg.LiveKitSecret).SetIdentity(fmt.Sprintf("%s_%d", m.ID, m.MediaGeneration)).SetName(m.DisplayName).SetValidFor(2 * time.Minute).AddGrant(grant).ToJWT()
 	if err != nil {
 		writeError(w, r, http.StatusInternalServerError, "voice_token_failed", "Voice could not start right now.", nil)
 		return
@@ -586,8 +606,14 @@ func (a *App) handleRealtime(w http.ResponseWriter, r *http.Request, ss session)
 }
 
 func (a *App) handleReady(w http.ResponseWriter, r *http.Request) {
-	if err := a.store.db.PingContext(r.Context()); err != nil {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+	if err := a.store.db.PingContext(ctx); err != nil {
 		writeError(w, r, http.StatusServiceUnavailable, "database_unready", "Database is unavailable.", nil)
+		return
+	}
+	if info, err := os.Stat(filepath.Join(a.cfg.StaticDir, "index.html")); err != nil || !info.Mode().IsRegular() {
+		writeError(w, r, http.StatusServiceUnavailable, "frontend_unready", "Frontend build is unavailable.", nil)
 		return
 	}
 	writeData(w, http.StatusOK, map[string]string{"status": "ready"})

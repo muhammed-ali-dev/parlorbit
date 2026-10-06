@@ -16,16 +16,18 @@ import (
 
 func main() {
 	cfg := app.Config{
-		Addr:             env("ADDR", ":"+env("PORT", "8080")),
-		EmbeddingEnabled: env("EMBEDDING_ENABLED", "false") == "true",
-		DatabasePath:     env("DATABASE_PATH", "roomcade.db"),
-		StaticDir:        env("STATIC_DIR", "dist"),
-		AllowedOrigins:   split(env("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:8080")),
-		SecureCookies:    env("SECURE_COOKIES", "false") == "true",
-		LiveKitURL:       os.Getenv("LIVEKIT_URL"),
-		LiveKitAPIKey:    os.Getenv("LIVEKIT_API_KEY"),
-		LiveKitSecret:    os.Getenv("LIVEKIT_API_SECRET"),
-		MetricsToken:     os.Getenv("METRICS_TOKEN"),
+		DemoPassword:         os.Getenv("DEMO_PASSWORD"),
+		DemoPasswordRequired: env("DEMO_PASSWORD_REQUIRED", "false") == "true",
+		Addr:                 env("ADDR", ":"+env("PORT", "8080")),
+		EmbeddingEnabled:     env("EMBEDDING_ENABLED", "false") == "true",
+		DatabasePath:         env("DATABASE_PATH", "roomcade.db"),
+		StaticDir:            env("STATIC_DIR", "dist"),
+		AllowedOrigins:       split(env("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:8080")),
+		SecureCookies:        env("SECURE_COOKIES", "false") == "true",
+		LiveKitURL:           os.Getenv("LIVEKIT_URL"),
+		LiveKitAPIKey:        os.Getenv("LIVEKIT_API_KEY"),
+		LiveKitSecret:        os.Getenv("LIVEKIT_API_SECRET"),
+		MetricsToken:         os.Getenv("METRICS_TOKEN"),
 	}
 	application, err := app.New(cfg)
 	if err != nil {

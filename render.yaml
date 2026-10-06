@@ -2,7 +2,7 @@ services:
   - type: web
     name: roomcade
     runtime: docker
-    plan: starter
+    plan: 0.5c-512mb
     healthCheckPath: /readyz
     envVars:
       - key: DATABASE_PATH
@@ -16,10 +16,16 @@ services:
           type: web
           name: roomcade
           envVarKey: RENDER_EXTERNAL_URL
+      - key: DEMO_PASSWORD_REQUIRED
+        value: "true"
+      - key: DEMO_PASSWORD
+        sync: false
       - key: METRICS_TOKEN
         generateValue: true
+      - key: EMBEDDING_ENABLED
+        value: "false"
       # Optional: add LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET
-      # in the dashboard when enabling voice.
+      # in the dashboard when enabling audio/video calls. See HOSTING.md.
     disk:
       name: roomcade-data
       mountPath: /var/data

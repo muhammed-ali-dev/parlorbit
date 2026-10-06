@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mutation Lab · Parlorbit</title>
+  <meta name="description" content="A shared arena that changes between rounds.">
+  <link rel="icon" href="./favicon.svg"><link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a id="back-link" class="back-link" href="/">← <span>Back to room</span></a>
+    <a class="lab-brand" href="/">Parlorbit</a>
+    <div class="top-actions">
+      <span id="engine-mode" class="mode">Demo mode</span>
+      <details class="options" id="options"><summary aria-label="Arena options">···</summary><div class="options-menu">
+        <button id="invite" disabled>Copy arena link</button>
+        <button id="show-code" disabled>Feature code</button>
+        <button id="demo-program" hidden>Try a portal demo</button>
+        <button id="reset" hidden>Reset game</button>
+        <p id="mode-description">Demo mode uses supported keywords. No AI model is called.</p>
+      </div></details>
+    </div>
+  </header>
+  <main><header class="lab-intro"><div><p class="eyebrow">A game you change together</p><h1>Mutation Lab</h1></div><p>Build a twist. Play it together.</p></header><div class="lab-layout">
+    <section class="arena-shell" aria-label="Game arena">
+      <div class="round-bar"><div><span id="round-label">Waiting</span><span class="separator">·</span><strong id="phase-label">Connecting</strong></div><span id="timer" class="timer">—</span></div>
+      <div class="canvas-wrap">
+        <canvas id="arena" width="1000" height="640" tabindex="0" aria-label="Arena. Move with WASD or arrow keys. Collect sparks and avoid hazards."></canvas>
+        <div id="join-overlay" class="overlay"><div class="phase-card"><h2 id="join-title">Opening the arena…</h2><p id="join-error" role="alert"></p><button id="retry" class="button" hidden>Try again</button></div></div>
+
+      </div>
+      <div class="arena-foot"><p id="play-help">Collect sparks. Avoid hazards.</p><div id="mutations" class="mutations" aria-label="Active mutations"></div></div>
+      <div id="touch-controls" class="touch-controls" aria-label="Touch movement controls" hidden><button data-direction="up" aria-label="Move up">↑</button><div><button data-direction="left" aria-label="Move left">←</button><button data-direction="down" aria-label="Move down">↓</button><button data-direction="right" aria-label="Move right">→</button></div></div>
+
+    </section><aside class="lab-panel" aria-label="Round workshop">        <div id="phase-overlay" class="workshop-content" hidden><div class="phase-card">
+          <h2 id="phase-title"></h2><p id="phase-description"></p>
+          <div id="composer" hidden>
+            <form id="prompt-form"><label class="sr-only" for="prompt">Your mutation</label><textarea id="prompt" rows="2" maxlength="180" placeholder="Make the floor slippery…"></textarea><div class="composer-actions"><details class="ideas"><summary>Ideas</summary><div class="suggestions"><button type="button" data-prompt="Make the floor slippery ice">Ice floor</button><button type="button" data-prompt="Add rising lava">Lava</button><button type="button" data-prompt="Make everyone fast and tiny">Fast + tiny</button><button type="button" data-prompt="Reverse controls and add bouncing hazards">Chaos</button></div></details><button id="submit-prompt" class="button primary">Submit</button></div></form>
+            <p id="prompt-feedback" class="feedback" role="status"></p><span id="prompt-status" class="prompt-status"></span>
+          </div>
+          <div id="results-list" class="results"></div>
+          <button id="start-button" class="button primary" hidden>Start game</button>
+          <button id="next-button" class="button quiet" hidden>Play now</button>
+        </div></div>      <div class="people-bar"><span id="player-count" class="player-count">0 players</span><div id="players" class="players" aria-label="Players and scores"></div></div></aside></div>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <dialog id="code-dialog" aria-labelledby="code-title"><div class="code-heading"><h2 id="code-title">Feature code</h2><button id="close-code" class="button">Close</button></div><p id="code-summary"></p><p class="code-note">ArenaScript formulas run on the shared server. The demo uses a handwritten example.</p><pre id="feature-code"></pre></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

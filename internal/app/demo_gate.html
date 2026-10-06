@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Demo access · Parlorbit</title>
+<style>
+@font-face{font-family:Nunito;src:url('/battle/nunito.woff2')}@font-face{font-family:Fredoka;src:url('/battle/fredoka.woff2')}
+:root{color-scheme:light dark;--paper: light-dark(#f7f8f5, #172323);--surface: light-dark(#ffffff, #1d2c2d);--ink: light-dark(#24363b, #e7f0ed);--muted: light-dark(#586e72, #a7bfbb);--line: light-dark(#d8e2df, #3a5150);--accent: light-dark(#236c68, #84c8bb);--accent-ink: light-dark(#ffffff, #15332d);--danger: light-dark(#b45162, #f0a4b1);font-family:Nunito,system-ui,sans-serif;background:var(--paper);color:var(--ink)}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:24px}main{width:min(100%,360px)}h1{font-family:Fredoka,system-ui,sans-serif;font-weight:500;font-size:28px;letter-spacing:-.5px;margin:0 0 12px}p{font-size:14px;color:var(--muted);line-height:1.6;margin:0 0 24px}label{display:block;font-size:13px;margin-bottom:8px}input{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px}button{width:100%;font:inherit;font-size:14px;background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;cursor:pointer;margin-top:12px}button:hover{filter:brightness(.96)}:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.error{color:var(--danger);font-size:13px;margin:10px 0 0}.note{font-size:11px;margin:16px 0 0}
+.brand{display:inline-block;font-family:Fredoka,system-ui,sans-serif;font-size:20px;text-decoration:none;color:var(--ink);margin-bottom:32px}input,button{min-height:44px}
+</style></head>
+<body><main><a class="brand" href="/" aria-label="Parlorbit home">Parlorbit</a><h1>Demo access</h1><p>Due to current model costs, you need a password for this demo.</p>
+<form action="/demo/unlock" method="post"><input type="hidden" name="next" value="{{.Next}}"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256" autofocus>{{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}<button type="submit">Enter demo</button></form>
+<p class="note">Have an invite? Enter the password shared with you.</p></main></body></html>

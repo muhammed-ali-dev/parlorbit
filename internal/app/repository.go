@@ -425,7 +425,15 @@ func (s *Store) joinStatus(ctx context.Context, requestID, sessionID string) (ma
 		status = "expired"
 
 	}
-	return map[string]any{"id": requestID, "houseId": houseID, "status": status, "expiresAt": expires}, err
+	result := map[string]any{"id": requestID, "houseId": houseID, "status": status, "expiresAt": expires}
+	if status == "approved" {
+		var roomID string
+		if err = s.db.QueryRowContext(ctx, `SELECT last_room_id FROM house_memberships WHERE house_id=? AND session_id=?`, houseID, sessionID).Scan(&roomID); err != nil {
+			return nil, errNotFound
+		}
+		result["roomId"] = roomID
+	}
+	return result, err
 }
 
 func (s *Store) decideJoin(ctx context.Context, houseID, requestID, sessionID, decision string) error {

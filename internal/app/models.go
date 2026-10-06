@@ -8,16 +8,18 @@ const (
 )
 
 type Config struct {
-	EmbeddingEnabled bool
-	Addr             string
-	DatabasePath     string
-	StaticDir        string
-	AllowedOrigins   []string
-	SecureCookies    bool
-	LiveKitURL       string
-	LiveKitAPIKey    string
-	LiveKitSecret    string
-	MetricsToken     string
+	DemoPassword         string
+	DemoPasswordRequired bool
+	EmbeddingEnabled     bool
+	Addr                 string
+	DatabasePath         string
+	StaticDir            string
+	AllowedOrigins       []string
+	SecureCookies        bool
+	LiveKitURL           string
+	LiveKitAPIKey        string
+	LiveKitSecret        string
+	MetricsToken         string
 }
 
 type HouseSummary struct {

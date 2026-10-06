@@ -15,15 +15,15 @@ type realtimeClient struct {
 	sessionID string
 	memberID  string
 	conn      *websocket.Conn
-	writeMu   sync.Mutex
+	outbox    *realtimeOutbox
 }
 
 func (c *realtimeClient) write(ctx context.Context, value any) error {
-	c.writeMu.Lock()
-	defer c.writeMu.Unlock()
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	return wsjson.Write(ctx, c.conn, value)
+	return c.outbox.enqueue(ctx, realtimePacket{value: value})
+}
+
+func (c *realtimeClient) writeAndClose(value any, status websocket.StatusCode, reason string) {
+	_ = c.outbox.enqueue(context.Background(), realtimePacket{value: value, after: func() { _ = c.conn.Close(status, reason) }})
 }
 
 type houseHub struct {
@@ -91,8 +91,7 @@ func (h *houseHub) attach(client *realtimeClient) {
 	}
 	h.mu.Unlock()
 	if previous != nil {
-		_ = previous.write(context.Background(), map[string]any{"type": "session.replaced"})
-		_ = previous.conn.Close(websocket.StatusPolicyViolation, "session replaced")
+		previous.writeAndClose(map[string]any{"type": "session.replaced"}, websocket.StatusPolicyViolation, "session replaced")
 	}
 	h.broadcast()
 	var host string
@@ -144,8 +143,7 @@ func (h *houseHub) evictMember(memberID string) {
 	}
 	h.mu.Unlock()
 	for _, client := range targets {
-		_ = client.write(context.Background(), map[string]any{"type": "membership.removed"})
-		_ = client.conn.Close(websocket.StatusPolicyViolation, "membership removed")
+		client.writeAndClose(map[string]any{"type": "membership.removed"}, websocket.StatusPolicyViolation, "membership removed")
 	}
 }
 
@@ -157,8 +155,7 @@ func (h *houseHub) closeDeletedHouse() {
 	}
 	h.mu.Unlock()
 	for _, client := range clients {
-		_ = client.write(context.Background(), map[string]any{"type": "house.deleted"})
-		_ = client.conn.Close(websocket.StatusNormalClosure, "house deleted")
+		client.writeAndClose(map[string]any{"type": "house.deleted"}, websocket.StatusNormalClosure, "house deleted")
 	}
 }
 
@@ -234,6 +231,12 @@ func (h *houseHub) scheduleHostRecovery(disconnectedMemberID string) {
 }
 
 func (h *houseHub) serve(ctx context.Context, client *realtimeClient) {
+	client.outbox = newRealtimeOutbox(ctx, func(writeCtx context.Context, value any) error {
+		writeCtx, cancel := context.WithTimeout(writeCtx, 5*time.Second)
+		defer cancel()
+		return wsjson.Write(writeCtx, client.conn, value)
+	}, func() { _ = client.conn.CloseNow() })
+	defer client.outbox.stop()
 	h.commands.Lock()
 	h.attach(client)
 	h.commands.Unlock()

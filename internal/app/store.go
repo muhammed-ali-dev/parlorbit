@@ -18,6 +18,8 @@ import (
 
 const schema = `
 PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS battle_ai_usage (bucket TEXT PRIMARY KEY, attempts INTEGER NOT NULL, created_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS demo_login_attempts (bucket TEXT PRIMARY KEY, attempts INTEGER NOT NULL, created_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, applied_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS guest_sessions (
   id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL,

@@ -14,10 +14,12 @@ COPY cmd ./cmd
 COPY internal ./internal
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /roomcade ./cmd/roomcade
 
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /roomcade-db ./cmd/roomcade-db
 FROM alpine:3.22
 RUN addgroup -S roomcade && adduser -S -G roomcade roomcade
 WORKDIR /app
 COPY --from=server /roomcade /app/roomcade
+COPY --from=server /roomcade-db /app/roomcade-db
 COPY --from=web /src/dist /app/dist
 RUN mkdir -p /var/data && chown -R roomcade:roomcade /var/data /app
 USER roomcade

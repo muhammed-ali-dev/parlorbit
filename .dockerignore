@@ -5,3 +5,7 @@ test-results
 roomcade-handoff
 experiments
 *.db*
+.env
+.env.*
+!.env.example
+screenshots

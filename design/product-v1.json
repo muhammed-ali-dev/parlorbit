@@ -1,0 +1,12 @@
+{
+  "fileKey": "ueqg10kXmMBfTNeFjMn2XB",
+  "status": "pending-figma-sync",
+  "reason": "Starter-plan MCP call limit after read-only discovery",
+  "product": "Private Codenames game nights; Mutation Lab secondary",
+  "source": ["web/src/App.tsx", "web/src/product.css", "web/src/components/HouseCard.tsx"],
+  "typography": { "family": "Nunito", "bodyWeight": 400, "headingWeight": 700 },
+  "screens": ["Home empty desktop", "Home collection desktop", "Home mobile", "Room game chooser desktop", "Room game chooser mobile", "Invite dialog"],
+  "existingComponents": {"Brand": "6:2", "Primary button": "4:60", "Quiet button": "4:62"},
+  "pendingComponents": [{"name": "HouseCard", "source": "web/src/components/HouseCard.tsx", "nodeId": null}],
+  "validation": {"figmaUpdated": false, "codeConnectPublished": false}
+}

@@ -13,7 +13,6 @@ import {
   CopyIcon,
   DoorOpenIcon,
   DotsThreeIcon,
-  FlameIcon,
   GearSixIcon,
   HeadphonesIcon,
   HouseIcon,
@@ -22,17 +21,21 @@ import {
   MicrophoneIcon,
   MicrophoneSlashIcon,
   MoonStarsIcon,
-  PauseIcon,
   PhoneDisconnectIcon,
   PlusIcon,
   RepeatIcon,
   SpeakerHighIcon,
   TrashIcon,
   UsersThreeIcon,
+  VideoCameraIcon,
+  VideoCameraSlashIcon,
   XIcon,
 } from '@phosphor-icons/react';
 import { api } from './api';
+import { HouseCard } from './components/HouseCard';
+import { VideoTile } from './components/VideoTile';
 import { useHouseRealtime } from './realtime';
+import { APIError } from './types';
 import type { HouseRoom, HouseSnapshot, InvitePreview, Member, RoomKind } from './types';
 import { useVoice } from './voice';
 
@@ -47,16 +50,16 @@ const roomIcons: Record<RoomKind, typeof ArmchairIcon> = {
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
-    <Link to="/" className={`brand ${compact ? 'brandCompact' : ''}`} aria-label="Roomcade home">
-      <img src="/assets/house-character.webp" alt="" />
-      <span>Roomcade</span>
+    <Link to="/" className={`brand ${compact ? 'brandCompact' : ''}`} aria-label="Parlorbit home">
+      <HouseIcon weight="bold" className="brandMark" />
+      <span>Parlorbit</span>
     </Link>
   );
 }
 
 function LoadingShell() {
   return (
-    <main className="loadingShell" aria-busy="true" aria-label="Opening Roomcade">
+    <main className="loadingShell" aria-busy="true" aria-label="Opening Parlorbit">
       <div className="skeleton skeletonBrand" />
       <div className="skeleton skeletonHero" />
       <div className="skeleton skeletonRow" />
@@ -67,7 +70,7 @@ function LoadingShell() {
 function Failure({ message, retry }: { message: string; retry?: () => void }) {
   return (
     <main className="centerPage">
-      <img className="errorPet" src="/assets/house-character.webp" alt="Roomcade’s little House character" />
+      <img className="errorPet" src="/assets/house-character.webp" alt="Parlorbit’s little House character" />
       <p className="eyebrow">The door stuck</p>
       <h1>We couldn’t get into the House.</h1>
       <p className="muted">{message}</p>
@@ -131,6 +134,8 @@ function App() {
 
 function Home({ houses }: { houses: Array<{ id: string; name: string; roomCount: number; memberCount: number; lastRoomId: string }> }) {
   const [createOpen, setCreateOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const visibleHouses = houses.filter(house => house.name.toLocaleLowerCase().includes(search.toLocaleLowerCase().trim()));
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -152,27 +157,12 @@ function Home({ houses }: { houses: Array<{ id: string; name: string; roomCount:
   return (
     <main className="home">
       <header className="homeTop"><Brand /><button className="button primary" onClick={() => setCreateOpen(true)}><PlusIcon /> Create a House</button></header>
-      <section className="homeHero">
-        <div><p className="eyebrow">A place for your people</p><h1>Make yourself at home.</h1><p>A few friends, a few rooms, something good to play.</p></div>
-        <img src="/assets/house-character.webp" alt="Roomcade’s little House character" />
+      <section className="nightIntro"><div><p className="eyebrow">Private game nights</p><h1>Game night starts here.</h1><p>One place for your friends, your rooms, and the next round of Codenames.</p></div><span className="guestBadge">No account needed</span></section>
+      <section className="homeHouses" aria-labelledby="houses-heading">
+        <div className="sectionHeading"><div><h2 id="houses-heading">Your Houses</h2><p>A private space for each group of friends.</p></div>{houses.length > 0 && <label className="houseSearch"><span className="srOnly">Find a House</span><input type="search" placeholder="Find a House…" value={search} onChange={event => setSearch(event.target.value)} /></label>}</div>
+        {houses.length > 0 ? <div className="nightGrid">{visibleHouses.map(house => <HouseCard key={house.id} house={house} />)}{!visibleHouses.length && <p className="searchEmpty" role="status">No Houses match “{search}”. Try another name.</p>}</div> : <div className="firstNight"><div className="firstNightLead"><HouseIcon size={28} /><h3>A House for your next game night.</h3><p>Create a private space, invite your friends, and choose a room to play in.</p><button className="button primary" onClick={() => setCreateOpen(true)}>Create your first House <ArrowRightIcon /></button></div><ol className="gettingStarted"><li><span>01</span><div><strong>Make a House</strong><p>Give your group a name. There’s room for eight.</p></div></li><li><span>02</span><div><strong>Invite your friends</strong><p>Share a link and approve who joins.</p></div></li><li><span>03</span><div><strong>Bring Codenames</strong><p>Share a private lobby and play the same match.</p></div></li></ol></div>}
       </section>
-      <div className="sectionHeading"><h2>Your Houses</h2><span>Available in this browser</span></div>
-      {houses.length ? (
-        <div className="houseGrid">
-          {houses.map((house) => (
-            <Link className="houseCard" key={house.id} to={`/houses/${house.id}${house.lastRoomId ? `/rooms/${house.lastRoomId}` : ''}`}>
-              <span className="homeSymbol"><HouseIcon size={26} /></span>
-              <h3>{house.name}</h3>
-              <span className="muted">{house.roomCount} {house.roomCount === 1 ? 'room' : 'rooms'} · {house.memberCount} {house.memberCount === 1 ? 'member' : 'members'}</span>
-              <span className="enterLink">Come on in <ArrowRightIcon /></span>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <button className="emptyHouse" onClick={() => setCreateOpen(true)}>
-          <BuildingsIcon size={32} /><strong>Your first House starts with one Living Room.</strong><span>Make a cozy place and invite your people.</span>
-        </button>
-      )}
+      <footer className="homeFoot"><p>Your access is saved in this browser. Clearing cookies or using another browser means asking to join again.</p><p>Have an invite? Open the link your host shared.</p></footer>
       <DialogShell open={createOpen} onOpenChange={setCreateOpen} title="A House of your own." description="Start small. There’s room for eight friends and four rooms.">
         <form onSubmit={submit} className="dialogForm">
           <TextField label="House name" name="name" placeholder="The Sunday Club" />
@@ -186,43 +176,48 @@ function Home({ houses }: { houses: Array<{ id: string; name: string; roomCount:
 }
 
 function JoinHouse() {
- const queryClient = useQueryClient();
- const knownHouses = queryClient.getQueryData<{houses: {id:string;lastRoomId:string}[]}>(["bootstrap"]);
+  const queryClient = useQueryClient();
+  const knownHouses = queryClient.getQueryData<{ houses: { id: string; lastRoomId: string }[] }>(['bootstrap']);
   const { token = '' } = useParams();
   const navigate = useNavigate();
-  const [requestId, setRequestId] = useState(() => sessionStorage.getItem(`roomcade:join:${token}`) ?? '');
+  const [requestId, setRequestId] = useState(() => localStorage.getItem(`roomcade:join:${token}`) ?? '');
   const preview = useQuery({ queryKey: ['invite', token], queryFn: () => api.invitePreview(token), retry: false });
   const status = useQuery({ queryKey: ['join-status', requestId], queryFn: () => api.joinStatus(requestId), enabled: Boolean(requestId), refetchInterval: query => query.state.data?.status && query.state.data.status !== 'pending' ? false : 2500, retry: false });
   const request = useMutation({
     mutationFn: (displayName: string) => api.requestJoin(token, displayName),
-    onSuccess: (result) => { setRequestId(result.id); sessionStorage.setItem(`roomcade:join:${token}`, result.id); },
+    onSuccess: result => { setRequestId(result.id); localStorage.setItem(`roomcade:join:${token}`, result.id); },
   });
+  useEffect(() => { setRequestId(localStorage.getItem(`roomcade:join:${token}`) ?? ''); }, [token]);
   useEffect(() => {
-    if (status.data?.status === 'approved') { void queryClient.invalidateQueries({queryKey:['bootstrap']}); navigate(`/houses/${status.data.houseId}`, { replace: true }); }
-  }, [navigate, status.data]);
+    if (status.data?.status === 'approved' && status.data.roomId) {
+      localStorage.removeItem(`roomcade:join:${token}`);
+      void queryClient.invalidateQueries({ queryKey: ['bootstrap'] });
+      navigate(`/houses/${status.data.houseId}/rooms/${status.data.roomId}`, { replace: true });
+    }
+  }, [navigate, status.data, queryClient, token]);
   if (preview.isLoading) return <LoadingShell />;
-  if (preview.isError) return <Failure message="This invite is invalid or has been rotated." />;
+  if (preview.isError) return <Failure message={preview.error instanceof APIError && preview.error.code === 'not_found' ? 'This invite is no longer available. Ask your host for a fresh link.' : 'We could not check this invite. Check your connection and try again.'} retry={() => { void preview.refetch(); }} />;
   const invite = preview.data as InvitePreview;
   const existing = knownHouses?.houses.find(house => house.id === invite.houseId);
-  if (existing) return <Navigate to={`/houses/${existing.id}/rooms/${existing.lastRoomId}`} replace />;
-  const terminal = status.isError || (status.data && status.data.status !== 'pending' && status.data.status !== 'approved');
-  const resetRequest = () => { sessionStorage.removeItem(`roomcade:join:${token}`); setRequestId(''); };
+  if (existing) return <Navigate to={existing.lastRoomId ? `/houses/${existing.id}/rooms/${existing.lastRoomId}` : `/houses/${existing.id}`} replace />;
+  const terminal = (status.isError && status.error instanceof APIError && ['not_found', 'forbidden'].includes(status.error.code)) || (status.data && status.data.status !== 'pending' && status.data.status !== 'approved');
+  const resetRequest = () => { localStorage.removeItem(`roomcade:join:${token}`); setRequestId(''); request.reset(); };
   return (
     <main className="joinPage">
       <Brand />
       <section className="joinPanel">
-        <img src="/assets/house-character.webp" alt="Roomcade’s little House character" />
-        <p className="eyebrow">You’re invited in</p><h1>{invite.houseName}</h1>
+        <p className="eyebrow">Private game night</p><h1>{invite.houseName}</h1>
         {terminal ? <div className="waiting"><h2>That request has ended.</h2><p>{status.isError ? 'Your request could not be found. You can ask to join again.' : status.data?.status === 'declined' ? 'The host declined this request.' : 'Your request expired or the invite changed.'}</p><button className="button" onClick={resetRequest}>Ask again</button></div> : requestId ? (
-          <div className="waiting"><DoorOpenIcon size={28} /><h2>Knock, knock.</h2><p>Your request is with the House host. This page will open when they let you in.</p><span className="statusDot">Waiting for approval</span>{status.data?.status === 'declined' && <p className="formError">The host declined this request.</p>}</div>
-        ) : invite.full ? <p className="notice errorNotice">This House is full right now.</p> : (
-          <form className="dialogForm" onSubmit={(event) => { event.preventDefault(); request.mutate(String(new FormData(event.currentTarget).get('displayName'))); }}>
-            <p>{invite.memberCount} of {invite.capacity} seats are taken. Pick a name and ask to join.</p>
+          <div className="waiting"><DoorOpenIcon size={28} /><h2>Waiting for your host.</h2><p>You will enter the room as soon as they approve. You can close this tab and reopen the invite to check back.</p><span className="statusDot" role="status">Waiting for approval</span>{status.isError && <p className="formError" role="alert">We could not check your request. Reconnecting… <button className="button quiet" onClick={() => { void status.refetch(); }}>Check again</button></p>}</div>
+        ) : invite.full ? <p className="notice errorNotice">This House is full right now. Ask your host when a seat opens.</p> : (
+          <form className="dialogForm" onSubmit={event => { event.preventDefault(); request.mutate(String(new FormData(event.currentTarget).get('displayName'))); }}>
+            <p>{invite.memberCount} of {invite.capacity} seats are taken. Enter the name your friends know, then ask the host to let you in.</p>
             <TextField label="Your name" name="displayName" placeholder="What friends call you" />
             {request.error && <p className="formError" role="alert">{request.error.message}</p>}
-            <button className="button primary wide" disabled={request.isPending}>Ask to join</button>
+            <button className="button primary wide" disabled={request.isPending}>{request.isPending ? 'Sending request…' : 'Ask to join'}</button>
           </form>
         )}
+        <p className="muted">No account needed. Access stays in this browser; clearing cookies or switching browsers means asking to join again.</p>
       </section>
     </main>
   );
@@ -237,7 +232,6 @@ function HouseView() {
   const [modal, setModal] = useState<ModalName>(null);
   const [notice, setNotice] = useState('');
   const [focusMode, setFocusMode] = useState(false);
-  const [firePaused, setFirePaused] = useState(() => localStorage.getItem('roomcade:fire-paused') === 'true');
   const currentRoom = snapshot?.rooms.find((room) => room.id === roomId);
   const switching = useRef(false);
  const selfRoomId = snapshot?.members.find(member => member.id === snapshot.selfMemberId)?.activeRoomId ?? '';
@@ -270,17 +264,16 @@ function HouseView() {
     } catch (error) { setNotice(error instanceof Error ? error.message : 'Could not enter this room.'); }
     finally { switching.current = false; }
   };
-  const toggleFire = () => { const next = !firePaused; setFirePaused(next); localStorage.setItem('roomcade:fire-paused', String(next)); };
 
   return (
-    <div className={`houseApp ${focusMode ? 'focusMode' : ''} ${firePaused ? 'firePaused' : ''}`}>
-      <div ref={voice.audioRoot} hidden />
+    <div className={`houseApp ${focusMode ? 'focusMode' : ''}`}>
+      <div ref={voice.audioRoot} data-room-audio hidden />
       <HouseTopBar house={snapshot} connection={connection} onModal={setModal} />
       <RoomTabs house={snapshot} activeRoomId={roomId} onRoom={enterRoom} onAdd={() => setModal('add-room')} />
       {connection !== 'connected' && <div className={`connectionNotice ${connection === 'replaced' ? 'errorNotice' : ''}`} role="status">{connection === 'replaced' ? 'This House opened in another tab. Close this tab or refresh to take over.' : 'Reconnecting to the House…'}</div>}
-      {connection === 'connected' && hostAway && <div className="connectionNotice" role="status">The House host is away. If they do not return within 30 seconds, Roomcade will pass the keys to the longest-standing person here.</div>}
+      {connection === 'connected' && hostAway && <div className="connectionNotice" role="status">The House host is away. If they do not return within 30 seconds, Parlorbit will pass the keys to the longest-standing person here.</div>}
       {roomId && currentRoom ? (
-        <RoomScene voice={voice} house={snapshot} room={currentRoom} onGame={() => setModal('game')} onRoomSettings={() => setModal('room-settings')} onFire={toggleFire} firePaused={firePaused} focusMode={focusMode} onFocusMode={() => setFocusMode((value) => !value)} />
+        <RoomScene voice={voice} house={snapshot} room={currentRoom} onGame={() => setModal('game')} onRoomSettings={() => setModal('room-settings')} focusMode={focusMode} onFocusMode={() => setFocusMode((value) => !value)} />
       ) : <HouseOverview house={snapshot} onRoom={enterRoom} onAdd={() => setModal('add-room')} />}
       {notice && <div className="toast" role="status">{notice}</div>}
       <HouseDialogs modal={modal} setModal={setModal} house={snapshot} room={currentRoom} onSnapshot={update} onRefresh={() => queryClient.invalidateQueries({ queryKey: ['bootstrap'] })} />
@@ -305,8 +298,7 @@ function HouseTopBar({ house, connection, onModal }: { house: HouseSnapshot; con
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
-      {house.permissions.isHost && Boolean(house.pendingRequests?.length) && <button className="button" onClick={() => onModal('manage')}>Join requests ({house.pendingRequests?.length})</button>}
-      <div className="houseMeta"><span className={`connectionDot ${connection}`} />{house.members.filter((member) => member.connected).length} here</div>
+      <div className="houseMeta">{house.permissions.isHost && <button className="button inviteAction" onClick={() => onModal('invite')}><PlusIcon /> Invite friends</button>}{house.permissions.isHost && Boolean(house.pendingRequests?.length) && <button className="button" onClick={() => onModal('manage')}>Join requests ({house.pendingRequests?.length})</button>}<span className={`connectionDot ${connection}`} />{house.members.filter((member) => member.connected).length} here</div>
     </header>
   );
 }
@@ -325,7 +317,7 @@ function RoomTabs({ house, activeRoomId, onRoom, onAdd }: { house: HouseSnapshot
 function HouseOverview({ house, onRoom, onAdd }: { house: HouseSnapshot; onRoom: (room: HouseRoom) => void; onAdd: () => void }) {
   return (
     <main className="overview">
-      <header className="overviewHero"><div><p className="eyebrow">A place for your people</p><h1>{house.name}</h1><p>A few rooms. Good company. Find your spot.</p></div><img src="/assets/house-character.webp" alt="Roomcade’s little House character" /></header>
+      <header className="overviewHero"><div><p className="eyebrow">A place for your people</p><h1>{house.name}</h1><p>A few rooms. Good company. Find your spot.</p></div><img src="/assets/house-character.webp" alt="Parlorbit’s little House character" /></header>
       <section className="floorplan" aria-label="House floor plan">
         {house.rooms.map((room) => { const Icon = roomIcons[room.kind]; const people = house.members.filter((member) => member.activeRoomId === room.id && member.connected).length; return (
           <button key={room.id} className={`planRoom kind-${room.kind}`} onClick={() => onRoom(room)}><span className="planTop"><Icon /><small>{people} here</small></span><strong>{room.name}</strong><span>{room.game ? 'Codenames' : 'Just hanging out'} <ArrowSquareOutIcon /></span></button>
@@ -337,23 +329,24 @@ function HouseOverview({ house, onRoom, onAdd }: { house: HouseSnapshot; onRoom:
   );
 }
 
-function RoomScene({ voice, house, room, onGame, onRoomSettings, onFire, firePaused, focusMode, onFocusMode }: { house: HouseSnapshot; room: HouseRoom; onGame: () => void; onRoomSettings: () => void; onFire: () => void; firePaused: boolean; focusMode: boolean; onFocusMode: () => void; voice: ReturnType<typeof useVoice> }) {
+function RoomScene({ voice, house, room, onGame, onRoomSettings, focusMode, onFocusMode }: { house: HouseSnapshot; room: HouseRoom; onGame: () => void; onRoomSettings: () => void; focusMode: boolean; onFocusMode: () => void; voice: ReturnType<typeof useVoice> }) {
   const members = house.members.filter((member) => member.activeRoomId === room.id && member.connected);
   return (
     <main className="roomScene">
-      <div className="scenery" aria-hidden="true"><div className="ceilingArt" /><div className="roomArt" /><Firelight /></div>
       <section className="roomContent">
-        <header className="roomHeading"><div><p className="eyebrow">{members.length ? `${members.length} here now` : 'A quiet room'}</p><h1>{room.name}</h1></div><div className="roomActions"><button className="iconButton surface" onClick={onFire} aria-label={firePaused ? 'Play fire animation' : 'Pause fire animation'}>{firePaused ? <FlameIcon /> : <PauseIcon />}</button>{house.permissions.isHost && <button className="iconButton surface" onClick={onRoomSettings} aria-label="Room settings"><GearSixIcon /></button>}</div></header>
-        <GameSurface room={room} selfMemberId={house.selfMemberId} isHost={house.permissions.isHost} onManage={onGame} focusMode={focusMode} onFocusMode={onFocusMode} />
+        <header className="roomHeading"><div><p className="eyebrow">{members.length ? `${members.length} here now` : 'A quiet room'}</p><h1>{room.name}</h1></div><div className="roomActions">{house.permissions.isHost && <button className="iconButton surface" onClick={onRoomSettings} aria-label="Room settings"><GearSixIcon /></button>}</div></header>
+        {!room.game ? <section className="roomGames" aria-label="Choose something to play">
+          <GameSurface room={room} selfMemberId={house.selfMemberId} isHost={house.permissions.isHost} onManage={onGame} focusMode={focusMode} onFocusMode={onFocusMode} />
+          <article className="labGameCard"><div className="gameCardTop"><span className="gameGlyph">✳</span><span className="gameBadge">Experimental</span></div><div><p className="eyebrow">A game you change together</p><h2>Mutation Lab</h2><p>Add an idea between rounds. Change the arena, then see who survives it.</p></div><a className="button" href={`/battle/arena.html?houseId=${encodeURIComponent(house.id)}&roomId=${encodeURIComponent(room.id)}`} target="_blank" rel="noreferrer">Enter the lab <ArrowRightIcon /></a><span className="gameCardNote">3 rounds · up to 8 players</span></article>
+        </section> : <><GameSurface room={room} selfMemberId={house.selfMemberId} isHost={house.permissions.isHost} onManage={onGame} focusMode={focusMode} onFocusMode={onFocusMode} /><a className="labInlineLink" href={`/battle/arena.html?houseId=${encodeURIComponent(house.id)}&roomId=${encodeURIComponent(room.id)}`} target="_blank" rel="noreferrer">Try Mutation Lab <ArrowRightIcon /></a></>}
+        {voice.videos.length > 0 && <section className="callVideos" aria-label="Room video call">{voice.videos.map(video => <VideoTile key={video.id} video={video} />)}</section>}
         <PeopleVoiceBar voice={voice} house={house} room={room} members={members} />
       </section>
     </main>
   );
 }
 
-function Firelight() {
-  return <div className="firelight"><span className="flame flameOne" /><span className="flame flameTwo" /><i className="ember emberOne" /><i className="ember emberTwo" /><i className="ember emberThree" /></div>;
-}
+
 
 function GameSurface({ room, selfMemberId, isHost, onManage, focusMode, onFocusMode }: { room: HouseRoom; selfMemberId: string; isHost: boolean; onManage: () => void; focusMode: boolean; onFocusMode: () => void }) {
   const queryClient = useQueryClient();
@@ -368,7 +361,7 @@ function GameSurface({ room, selfMemberId, isHost, onManage, focusMode, onFocusM
       <div className="emptyGameInner"><LightbulbFilamentIcon size={34} /><p className="eyebrow">The table is clear</p><h2>Bring Codenames in.</h2><p>Create a private lobby, then share its room link here. Everyone gets their own view of the same match.</p><button className="button primary" onClick={onManage}>Set up Codenames</button></div>
     </section>
   );
-  if (!embeddingEnabled) return <section className="emptyGame"><div className="emptyGameInner"><p className="eyebrow">The table is ready</p><h2>Codenames</h2><p>Open the shared lobby to play. Keep Roomcade open for your room’s voice chat.</p><a className="button primary" href={room.game.url} target="_blank" rel="noreferrer">Open Codenames</a>{canManage && <button className="button" onClick={onManage}>Manage game</button>}</div></section>;
+  if (!embeddingEnabled) return <section className="emptyGame"><div className="emptyGameInner"><p className="eyebrow">The table is ready</p><h2>Codenames</h2><p>Open the shared lobby to play. Keep Parlorbit open for your room’s voice chat.</p><a className="button primary" href={room.game.url} target="_blank" rel="noreferrer">Open Codenames</a>{canManage && <button className="button" onClick={onManage}>Manage game</button>}</div></section>;
   return (
     <section className="gameSurface">
       <div className="gameToolbar"><div><strong>Codenames</strong><span>Shared room · separate player views</span></div><div className="toolbarActions"><button className="button quiet" onClick={onFocusMode}>{focusMode ? 'Return to room' : 'Focus game'}</button><button className="iconButton quiet" onClick={() => { setFrameKey((key) => key + 1); setLoaded(false); }} aria-label="Reload game for me"><RepeatIcon /></button><a className="iconButton quiet" href={room.game.url} target="_blank" rel="noreferrer" aria-label="Open Codenames in another tab"><ArrowSquareOutIcon /></a>{canManage && <button className="iconButton quiet" onClick={onManage} aria-label="Manage game"><DotsThreeIcon /></button>}</div></div>
@@ -388,8 +381,9 @@ function PeopleVoiceBar({ voice, house, room, members }: { house: HouseSnapshot;
       <div className="voiceCluster">
         <span className={`voiceStatus ${voice.state}`}>{voice.state === 'connected' ? <SpeakerHighIcon /> : <HeadphonesIcon />}{voice.message}</span>
         <div className="voiceActions">
-          {(!voice.desired || voice.state === 'error') ? <button className="button primary" onClick={voice.join}><HeadphonesIcon /> Join voice</button> : <><button className="button" onClick={voice.toggleMute} disabled={voice.state === 'connecting' || voice.state === 'reconnecting'}>{voice.muted ? <MicrophoneSlashIcon /> : <MicrophoneIcon />}{voice.state === 'listen-only' ? 'Enable microphone' : voice.muted ? 'Unmute' : 'Mute'}</button><button className="iconButton danger" onClick={voice.leave} aria-label="Leave voice"><PhoneDisconnectIcon /></button></>}
+          {(!voice.desired || voice.state === 'error') ? <button className="button primary" onClick={voice.join}><HeadphonesIcon /> Join voice</button> : <><button className="button" onClick={voice.toggleMute} disabled={voice.microphoneBusy || voice.state === 'connecting' || voice.state === 'reconnecting'}>{voice.muted ? <MicrophoneSlashIcon /> : <MicrophoneIcon />}{voice.state === 'listen-only' ? 'Enable microphone' : voice.muted ? 'Unmute' : 'Mute'}</button><button className="button" onClick={voice.toggleCamera} disabled={voice.cameraBusy || !['connected', 'listen-only'].includes(voice.state)} aria-pressed={voice.cameraEnabled}>{voice.cameraEnabled ? <VideoCameraSlashIcon /> : <VideoCameraIcon />}{voice.cameraBusy ? 'Starting camera…' : voice.cameraEnabled ? 'Camera off' : 'Camera on'}</button><button className="iconButton danger" onClick={voice.leave} aria-label="Leave voice"><PhoneDisconnectIcon /></button></>}
         </div>
+        {voice.cameraError && <p className="cameraError" role="alert">{voice.cameraError}</p>}
         {voice.needsAudio && <button className="button" onClick={voice.enableAudio}>Enable sound</button>}
       </div>
     </section>

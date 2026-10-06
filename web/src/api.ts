@@ -9,7 +9,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
     const error = payload?.error;
-    throw new APIError(error?.message ?? 'Roomcade could not finish that request.', error?.code, error?.requestId);
+    throw new APIError(error?.message ?? 'Parlorbit could not finish that request.', error?.code, error?.requestId);
   }
   return payload.data as T;
 };
@@ -32,7 +32,7 @@ export const api = {
   deleteRoom: (houseId: string, roomId: string) => request<HouseSnapshot>(`/api/v1/houses/${houseId}/rooms/${roomId}`, { method: 'DELETE' }),
   invitePreview: (token: string) => request<InvitePreview>(`/api/v1/invites/${encodeURIComponent(token)}`),
   requestJoin: (token: string, displayName: string) => request<{ id: string; status: string; expiresAt: number }>(`/api/v1/invites/${encodeURIComponent(token)}/requests`, { method: 'POST', headers: { 'Idempotency-Key': crypto.randomUUID() }, body: JSON.stringify({ displayName }) }),
-  joinStatus: (requestId: string) => request<{ id: string; houseId: string; status: string; expiresAt: number }>(`/api/v1/join-requests/${requestId}`),
+  joinStatus: (requestId: string) => request<{ id: string; houseId: string; roomId?: string; status: string; expiresAt: number }>(`/api/v1/join-requests/${requestId}`),
   decideJoin: (houseId: string, requestId: string, decision: 'approve' | 'decline') => request(`/api/v1/houses/${houseId}/join-requests/${requestId}/decision`, { method: 'POST', body: JSON.stringify({ decision }) }),
   rotateInvite: (houseId: string) => request<{ inviteToken: string }>(`/api/v1/houses/${houseId}/invite/rotate`, { method: 'POST', body: '{}' }),
   removeMember: (houseId: string, memberId: string) => request(`/api/v1/houses/${houseId}/members/${memberId}`, { method: 'DELETE' }),

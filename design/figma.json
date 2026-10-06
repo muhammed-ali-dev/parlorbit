@@ -1,0 +1,598 @@
+{
+  "fileKey": "ueqg10kXmMBfTNeFjMn2XB",
+  "removedNodeIds": [
+    "3:2"
+  ],
+  "mutatedNodeIds": [
+    "0:1"
+  ],
+  "nodes": [
+    {
+      "id": "4:59",
+      "name": "Foundations / reusable controls",
+      "type": "FRAME",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "5:2",
+      "name": "Home \u00b7 desktop",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "5:3",
+      "name": "Home \u00b7 mobile",
+      "type": "FRAME",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "5:4",
+      "name": "Mutation Lab \u00b7 desktop",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "5:5",
+      "name": "Demo access \u00b7 mobile",
+      "type": "FRAME",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "12:23",
+      "name": "Mutation Lab \u00b7 mobile",
+      "type": "FRAME",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "variables": [
+    {
+      "id": "VariableID:4:3",
+      "name": "palette/paper",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:4",
+      "name": "color/paper",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--paper)"
+      }
+    },
+    {
+      "id": "VariableID:4:5",
+      "name": "palette/surface",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:6",
+      "name": "color/surface",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--surface)"
+      }
+    },
+    {
+      "id": "VariableID:4:7",
+      "name": "palette/ink",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:8",
+      "name": "color/ink",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--ink)"
+      }
+    },
+    {
+      "id": "VariableID:4:9",
+      "name": "palette/muted",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:10",
+      "name": "color/muted",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--muted)"
+      }
+    },
+    {
+      "id": "VariableID:4:11",
+      "name": "palette/line",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:12",
+      "name": "color/line",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--line)"
+      }
+    },
+    {
+      "id": "VariableID:4:13",
+      "name": "palette/accent",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:14",
+      "name": "color/accent",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--accent)"
+      }
+    },
+    {
+      "id": "VariableID:4:15",
+      "name": "palette/accent-ink",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:16",
+      "name": "color/accent-ink",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--accent-ink)"
+      }
+    },
+    {
+      "id": "VariableID:4:17",
+      "name": "palette/sage",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:18",
+      "name": "color/sage",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--sage)"
+      }
+    },
+    {
+      "id": "VariableID:4:19",
+      "name": "palette/green",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:20",
+      "name": "color/green",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--green)"
+      }
+    },
+    {
+      "id": "VariableID:4:21",
+      "name": "palette/honey",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:22",
+      "name": "color/honey",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--honey)"
+      }
+    },
+    {
+      "id": "VariableID:4:23",
+      "name": "palette/honey-soft",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:24",
+      "name": "color/honey-soft",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--honey-soft)"
+      }
+    },
+    {
+      "id": "VariableID:4:25",
+      "name": "palette/game",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:26",
+      "name": "color/game",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--game)"
+      }
+    },
+    {
+      "id": "VariableID:4:27",
+      "name": "palette/game-line",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:28",
+      "name": "color/game-line",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--game-line)"
+      }
+    },
+    {
+      "id": "VariableID:4:29",
+      "name": "palette/clay",
+      "scopes": [],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:30",
+      "name": "color/clay",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--clay)"
+      }
+    },
+    {
+      "id": "VariableID:4:31",
+      "name": "space/0",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:32",
+      "name": "space/4",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:33",
+      "name": "space/6",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:34",
+      "name": "space/8",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:35",
+      "name": "space/10",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:36",
+      "name": "space/12",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:37",
+      "name": "space/14",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:38",
+      "name": "space/16",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:39",
+      "name": "space/18",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:40",
+      "name": "space/20",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:41",
+      "name": "space/24",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:42",
+      "name": "space/32",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:43",
+      "name": "space/36",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:44",
+      "name": "space/40",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:45",
+      "name": "space/48",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:46",
+      "name": "radius/8",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:47",
+      "name": "radius/10",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:48",
+      "name": "radius/14",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {}
+    },
+    {
+      "id": "VariableID:4:49",
+      "name": "radius/16",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {}
+    }
+  ],
+  "textStyles": [
+    {
+      "id": "S:06ab696a8cfad56f9d55eb977239eea39f890a61,",
+      "name": "Parlorbit/hero",
+      "font": {
+        "family": "Fredoka",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "wdth": 100
+        }
+      }
+    },
+    {
+      "id": "S:7b931f8babf6bf9b36147e5e8bb1e0d78daf0b59,",
+      "name": "Parlorbit/hero-mobile",
+      "font": {
+        "family": "Fredoka",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "wdth": 100
+        }
+      }
+    },
+    {
+      "id": "S:24d8652c1786435253388dba8d34cd0909ce5570,",
+      "name": "Parlorbit/heading",
+      "font": {
+        "family": "Fredoka",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "wdth": 100
+        }
+      }
+    },
+    {
+      "id": "S:1a010b3c153799d557386e078dd7b64aed2b34ef,",
+      "name": "Parlorbit/brand",
+      "font": {
+        "family": "Fredoka",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "wdth": 100
+        }
+      }
+    },
+    {
+      "id": "S:27f8197d19162acc3dcc4f2d7acf4d4d74f1b6e9,",
+      "name": "Parlorbit/card-title",
+      "font": {
+        "family": "Fredoka",
+        "style": "Medium",
+        "variationSettings": {
+          "wght": 500,
+          "wdth": 100
+        }
+      }
+    },
+    {
+      "id": "S:a8ebf9604b2f7d042b461fa5dba8e0fcf1fd40aa,",
+      "name": "Parlorbit/body",
+      "font": {
+        "family": "Nunito",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      }
+    },
+    {
+      "id": "S:63cbaee753cefafb632a47012832ac1932d49823,",
+      "name": "Parlorbit/control",
+      "font": {
+        "family": "Nunito",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      }
+    },
+    {
+      "id": "S:8799cc98b93e3b0556124f7ff50d66f68722bd8e,",
+      "name": "Parlorbit/caption",
+      "font": {
+        "family": "Nunito",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      }
+    },
+    {
+      "id": "S:54a20806106c5a546996024b03566da73f8b50ab,",
+      "name": "Parlorbit/eyebrow",
+      "font": {
+        "family": "Nunito",
+        "style": "Regular",
+        "variationSettings": {
+          "wght": 400
+        }
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "4:64",
+      "name": "Button",
+      "type": "COMPONENT_SET"
+    },
+    {
+      "id": "4:60",
+      "name": "Style=Primary",
+      "type": "COMPONENT"
+    },
+    {
+      "id": "4:62",
+      "name": "Style=Quiet",
+      "type": "COMPONENT"
+    },
+    {
+      "id": "4:65",
+      "name": "Input",
+      "type": "COMPONENT"
+    },
+    {
+      "id": "6:2",
+      "name": "Brand",
+      "type": "COMPONENT"
+    },
+    {
+      "id": "6:5",
+      "name": "Empty House",
+      "type": "COMPONENT"
+    },
+    {
+      "id": "7:16",
+      "name": "Arena / lobby",
+      "type": "COMPONENT"
+    }
+  ],
+  "validation": {
+    "fonts": [
+      "Fredoka",
+      "Nunito"
+    ],
+    "screens": 5,
+    "layout": "editable text, auto-layout frames, vectors and component instances; mascot is a discrete image",
+    "nameStatus": "Parlorbit is a working name, not trademark clearance",
+    "fileTitle": "Figma connector cannot rename the earlier Nookshift file title; canvas and app branding use Parlorbit"
+  }
+}

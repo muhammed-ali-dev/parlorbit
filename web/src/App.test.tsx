@@ -16,6 +16,6 @@ beforeEach(() => {
 test('shows a useful empty House state for a new browser', async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(<QueryClientProvider client={client}><MemoryRouter><App /></MemoryRouter></QueryClientProvider>);
-  expect(await screen.findByText('Make yourself at home.')).toBeInTheDocument();
-  expect(screen.getByText('Your first House starts with one Living Room.')).toBeInTheDocument();
+  expect(await screen.findByText('Game night starts here.')).toBeInTheDocument();
+  expect(screen.getByText('A House for your next game night.')).toBeInTheDocument();
 });

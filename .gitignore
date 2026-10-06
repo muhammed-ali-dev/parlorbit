@@ -16,5 +16,7 @@ vite.config.d.ts
 # Local planning and design references
 /plan-1-after-experiments.md
 /Roomcade-Codex-Context.md
-/docs/
+/docs/*
+!/docs/architecture.md
+!/docs/product-architecture.md
 /roomcade-handoff/
